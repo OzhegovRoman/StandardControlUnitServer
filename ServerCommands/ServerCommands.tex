@@ -1,0 +1,76 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{cmap}
+\usepackage{array}
+\usepackage[top=2cm, bottom=2cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{sectsty}
+
+\newcommand\Tstrut{\rule{0pt}{4ex}}         % = `top' strut
+\newcommand\Bstrut{\rule[-3ex]{0pt}{0pt}}   % = `bottom' strut
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+\newcommand{\Card}[4]{
+\fontsize{12pt}{15pt}
+\sffamily
+\selectfont
+
+\begin{tabular*}{\textwidth}{ R{2.6cm} p{12.5cm}  } 
+\hline
+ \multicolumn{2}{l}{\large{\textbf{#1}}} \Tstrut\\
+ \textbf{Description:} & \textbf{(RU)} #3.  \\ 
+   & \textbf{(EN)} #4.  \\ 
+ \textbf{Input:} & #2  \Bstrut\\ 
+\hline\\
+\end{tabular*}
+}
+ 
+\begin{document}
+\allsectionsfont{\sffamily}
+
+\begin{tabular*}{\textwidth \sffamily }{ R{3cm} p{11cm}  } 
+
+ \multicolumn{2}{l}{\large{\textbf{Обозначения}}} \Tstrut \Bstrut\\
+ \textbf{\large{<N>}} &  вместо этой записи вставляется номер устройства 0-... (не знаю даже какой предел)  \\ 
+ \textbf{\large{[DEVice<N>:]}} & необязательная запись, если она опускается то будет обработана команда, соответствующая N=0. Важно: при подключении устройств порядок их вовсе не определяется порядком подключения, т.е. первое подключенное устройство не обязательно будет с индексом 0. Необходимо проверять к какому устройству вы подключаетесь через запрос его серийного номера \\
+ \textbf{\large{[CHANnel<K>:]}} & необязательная запись, если она опускается то будет обработана команда, соответствующая K=0. Важно: если устройство имеет только один канал его адрес всегда будет 0 и не важно какой физический адрес он занимает внутри устройства (0 или 1). Так в стандартных коробках для HEB всегда использовался 2-ой канал, здесь он будет с индеском 0\\
+ \Bstrut\\\\
+
+ \multicolumn{2}{l}{\large{\textbf{Типы данных}}} \Tstrut \Bstrut\\
+ \textbf{\large{Float}} &  1E-5 or 0.00001  \\ 
+ \textbf{\large{JSON}} & \{ "Channel0":\{"Current":0, "Voltage": 0\} , "P": 0 , "T": 250\} \\ 
+ \textbf{\large{Byte}} & 0-255  \\ 
+ \textbf{\large{Bool}} & 0 - disable, 1 - enable \Bstrut\\\\
+
+\end{tabular*}
+
+\textbf{\huge{System request}}
+     \Card{*IDN?	}{*IDN?}{ Идентификация устройства. Ответ: "Server for Scontel's Bias Unit"}{}
+     \Card{SYST:ENUM}{SYSTem:ENUMerate}{Gереподключаем устройства}{}
+     \Card{SYST:COUN?}{SYSTem:COUNt?}{Запрос количества устройств. Ответ: подключенное число устройств}{ }
+     \Card{SYST:DEVL?}{SYSTem:DEViceList?}{Получить список серийных номеров подключенных устройств. Ответ: список серийных номеров устойств через "\textbackslash r\textbackslash n"}{}
+     
+\textbf{\huge{Device request}}
+     \Card{[DEV<N>:]SERN?}{[DEVice<N>:]SERialNumber?}				{Получение серийного номера устройства}{}
+     \Card{[DEV<N>:]DESC?}{[DEVice<N>:]DESCription?}				{Получить описание устройства}{}
+     \Card{[DEV<N>:]DATA?}{[DEVice<N>:]DATA?}						{Получить текущие данные устройства в JSON}{}
+     \Card{[DEV<N>:]PRES?}{[DEVice<N>:]PRESsure?}					{Получить значение давления}{}
+     \Card{[DEV<N>:]TEMP?}{[DEVice<N>:]TEMPerature?}				{Получить значение температуры}{}
+     \Card{[DEV<N>:]HEAT?}{[DEVice<N>:]HEATer?}						{Получить значение напряжения печки}{}
+     \Card{[DEV<N>:]HEAT}{[DEVice<N>:]HEATer <Value/Float>}			{Установить значение напряжения печки}{}
+     \Card{[DEV<N>:]BATP?}{[DEVice<N>:]BATteryPositive?}			{Получить значение напряжения положительной батареи}{}
+     \Card{[DEV<N>:]BATN?}{[DEVice<N>:]BATteryNegative?}			{Получить значение напряжения отрицательной батареи}{}
+     \Card{[DEV<N>:]CURR?}{[DEVice<N>:]CURRent?}					{Получить значение тока канала K}{}
+     \Card{[DEV<N>:]CURR}{[DEVice<N>:]CURRent <Value/Float>}		{Установить значение тока канала K}{}
+     \Card{[DEV<N>:]VOLT?}{[DEVice<N>:]VOLTage?}					{Получить значение напряжения канала K}{}
+     \Card{[DEV<N>:]VOLT}{[DEVice<N>:]VOLTage <Value/Float>}		{Установить значение напряжения канала K}{}
+     \Card{[DEV<N>:]MODE?}{[DEVice<N>:]MODE?}						{Получить режим работы канала K. 0 - режим стабилизации напряжения, 1 - режим стабилизации тока}{}
+     \Card{[DEV<N>:]MODE}{[DEVice<N>:]MODE <Value/Bool>}			{Установить режим работы канала K. 0 - режим стабилизации напряжения, 1 - режим стабилизации тока}{}
+     \Card{[DEV<N>:]SHORT?}{[DEVice<N>:]SHORT?}						{Получить режим закоротки канала K. 0 - раскорочен, 1 - закорочен}{}
+     \Card{[DEV<N>:]SHORT}{[DEVice<N>:]SHORT <Value/Bool>}			{Установить режим закоротки канала K. 0 - раскорочен, 1 - закорочен}{}
+
+\end{document}
